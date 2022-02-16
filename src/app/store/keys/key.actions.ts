@@ -44,9 +44,8 @@ const setWalletEncryptionPassword = (password: string): AppThunk => {
     });
 
     dispatch(inMemoryKeySlice.actions.setKeysInMemory({ default: secretKey }));
-
     dispatch(
-      keySlice.actions.createNewWalletComplete({
+      keySlice.actions.createNewSoftwareWalletComplete({
         type: 'software',
         id: 'default',
         salt,
@@ -62,6 +61,7 @@ const unlockWalletAction = (password: string): AppThunk => {
   return async (dispatch, getState) => {
     const currentKey = selectCurrentKey(getState());
     if (!currentKey) return;
+    if (currentKey.type !== 'software') return;
     const { encryptedSecretKey, salt } = currentKey;
     const decryptedData = await decryptMnemonic({ encryptedSecretKey, password, salt });
 

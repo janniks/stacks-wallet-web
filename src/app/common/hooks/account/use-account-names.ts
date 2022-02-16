@@ -14,7 +14,6 @@ export function useCurrentAccountDisplayName() {
 
 export function useAccountDisplayName(address: string, index: number) {
   const names = useGetAccountNamesByAddressQuery(address);
-
   return useMemo(() => {
     if (!names.length) return `Account ${index + 1}`;
     return names[0];

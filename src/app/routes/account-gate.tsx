@@ -28,6 +28,8 @@ export const AccountGate = ({ children }: AccountGateProps) => {
   const yetToBeEncryptedKey = useGeneratedSecretKey();
   const currentInMemorySecretKey = useDefaultWalletSecretKey();
 
+  if (currentKeyDetails?.type === 'ledger') return <>{children}</>;
+
   if (shouldNavigateBackToBackupSecretKeyPage(currentKeyDetails, yetToBeEncryptedKey))
     return <Navigate to={RouteUrls.BackUpSecretKey} />;
 

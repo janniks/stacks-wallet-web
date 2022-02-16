@@ -9,8 +9,15 @@ interface KeyConfigSoftware {
   encryptedSecretKey: string;
   salt: string;
 }
+interface KeyConfigLedger {
+  type: 'ledger';
+  id: string;
+  publicKeys: string[];
+}
 
-const keyAdapter = createEntityAdapter<KeyConfigSoftware>();
+type KeyConfig = KeyConfigSoftware | KeyConfigLedger;
+
+const keyAdapter = createEntityAdapter<KeyConfig>();
 
 // Only used during onboarding, pre-wallet creation
 // Could well be persisted elsewhere
@@ -36,7 +43,7 @@ export const keySlice = createSlice({
       state.secretKey = null;
     },
 
-    createNewWalletComplete(state, action: PayloadAction<KeyConfigSoftware>) {
+    createNewSoftwareWalletComplete(state, action: PayloadAction<KeyConfigSoftware>) {
       state.secretKey = null;
       keyAdapter.addOne(state, action.payload);
     },
@@ -47,6 +54,10 @@ export const keySlice = createSlice({
 
     signOut(state) {
       keyAdapter.removeOne(state, 'default');
+    },
+
+    createLedgerWallet(state, action: PayloadAction<KeyConfigLedger>) {
+      keyAdapter.addOne(state, action.payload);
     },
   },
 });
