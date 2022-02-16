@@ -16,12 +16,14 @@ import { useCurrentAccount } from '@app/store/accounts/account.hooks';
 import { AccountInfoFetcher, BalanceFetcher } from './components/fetchers';
 import { CENTERED_FULL_PAGE_MAX_WIDTH } from '@app/components/global-styles/full-page-styles';
 import { HomeTabs } from './components/home-tabs';
+import { useTrackFirstDeposit } from '@app/common/hooks/analytics/transactions-analytics.hooks';
 
 export function Home() {
   const { decodedAuthRequest } = useOnboardingState();
   const navigate = useNavigate();
 
   const account = useCurrentAccount();
+  useTrackFirstDeposit();
 
   useRouteHeader(
     <>
