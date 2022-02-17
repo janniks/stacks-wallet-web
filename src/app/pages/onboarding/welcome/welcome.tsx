@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,12 +10,8 @@ import { RouteUrls } from '@shared/route-urls';
 import { useHasAllowedDiagnostics } from '@app/store/onboarding/onboarding.hooks';
 import { WelcomeLayout } from './welcome.layout';
 import { useKeyActions } from '@app/common/hooks/use-key-actions';
-import Transport from '@ledgerhq/hw-transport-webusb';
-import StacksApp from '@zondax/ledger-blockstack';
-import { AddressVersion } from '@stacks/transactions';
-import { useDispatch } from 'react-redux';
-import { keySlice } from '@app/store/keys/key.slice';
-import toast from 'react-hot-toast';
+
+import { connectLedger, pullKeysFromLedgerDevice } from '@app/features/ledger/ledger-utils';
 
 export const WelcomePage = memo(() => {
   const [hasAllowedDiagnostics] = useHasAllowedDiagnostics();
@@ -22,8 +19,6 @@ export const WelcomePage = memo(() => {
   const { decodedAuthRequest } = useOnboardingState();
   const analytics = useAnalytics();
   const keyActions = useKeyActions();
-
-  const dispatch = useDispatch();
 
   useRouteHeader(<Header hideActions />);
 
@@ -48,40 +43,17 @@ export const WelcomePage = memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    void analytics.track('xxx_testing_integration');
+  });
+
   return (
     <>
       <button
         onClick={async () => {
-          const STX_DERIVATION_PATH = `m/44'/5757'/0'/0/0`;
-          console.log('Ledger connected');
-          const transport = await Transport.create();
-          const stacks = new StacksApp(transport);
-          const result = await stacks.getAppInfo();
-          console.log(result);
-
-          const mainnetPublicKey = await stacks.getAddressAndPubKey(
-            STX_DERIVATION_PATH,
-            AddressVersion.MainnetSingleSig
-          );
-          console.log(mainnetPublicKey);
-          console.log(mainnetPublicKey.publicKey.toString('hex'));
-          const testnetPublicKey = await stacks.getAddressAndPubKey(
-            STX_DERIVATION_PATH,
-            AddressVersion.TestnetSingleSig
-          );
-          console.log(testnetPublicKey);
-          console.log(testnetPublicKey.publicKey.toString('hex'));
-          if (mainnetPublicKey.publicKey) {
-            toast.success('Pulled keys from device');
-            dispatch(
-              keySlice.actions.createLedgerWallet({
-                type: 'ledger',
-                id: 'default',
-                publicKeys: [mainnetPublicKey.publicKey.toString('hex')],
-              })
-            );
-            navigate(RouteUrls.Home);
-          }
+          const stacks = await connectLedger();
+          const publicKeys = await pullKeysFromLedgerDevice(stacks);
+          console.log(publicKeys);
         }}
       >
         open ledger
