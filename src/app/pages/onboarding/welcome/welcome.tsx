@@ -44,6 +44,7 @@ export const WelcomePage = memo(() => {
   return (
     <WelcomeLayout
       isGeneratingWallet={isGeneratingWallet}
+      onSelectConnectLedger={() => navigate(RouteUrls.ConnectLedger)}
       onStartOnboarding={() => startOnboarding()}
       onRestoreWallet={() => navigate(RouteUrls.SignIn)}
     />
