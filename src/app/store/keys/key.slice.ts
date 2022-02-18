@@ -25,7 +25,9 @@ interface ExtraKeyState {
   secretKey?: null | string;
 }
 
-export const initialKeysState = keyAdapter.getInitialState<ExtraKeyState>({ secretKey: null });
+export const initialKeysState = keyAdapter.getInitialState<ExtraKeyState>({
+  secretKey: null,
+});
 
 export const keySlice = createSlice({
   name: 'keys',
